@@ -4,16 +4,16 @@
   --background: #ffffff;
   --foreground: #171717;
 
-  --background-dark: #0b1e43;
-  --background-light: #f2f2f2;
+  --background-dark: #0d224a;
+  --background-light: #eef7ff;
 
   --white: #ffffff;
   --black: #000000;
 
-  --red: #d62828;
-  --green: #2ecc71;
-  --grey: #95a5a6;
-  --primary: #4a6cf7;
+  --red: #ee0039;
+  --green: #11c25d;
+  --grey: #8ca3cd;
+  --primary: #5272ff;
 }
 
 @theme inline {
