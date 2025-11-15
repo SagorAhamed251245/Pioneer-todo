@@ -38,7 +38,7 @@ const SignupForm = () => {
   };
 
   return (
-    <div className="max-w-md mt-9">
+    <div className="w-full max-w-lg mt-9">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* FIRST + LAST NAME */}
         <div className="grid grid-cols-2 gap-4">
