@@ -3,16 +3,39 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --background-dark: #0b1e43;
+  --background-light: #f2f2f2;
+
+  --white: #ffffff;
+  --black: #000000;
+
+  --red: #d62828;
+  --green: #2ecc71;
+  --grey: #95a5a6;
+  --primary: #4a6cf7;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-background-dark: var(--background-dark);
+  --color-background-light: var(--background-light);
+
+  --color-white: var(--white);
+  --color-black: var(--black);
+
+  --color-red: var(--red);
+  --color-green: var(--green);
+  --color-grey: var(--grey);
+  --color-primary: var(--primary);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
