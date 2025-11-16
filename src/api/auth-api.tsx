@@ -16,7 +16,7 @@ export const signupApi = async (
 
 export const loginApi = async (
   query: TUserLogin
-): Promise<TLoginRes & { ok: boolean }> => {
+): Promise<TLoginRes & { ok: boolean; detail?: string }> => {
   const res = await fetch(baseApi(`/api/auth/login/`), {
     method: "POST",
     headers: {

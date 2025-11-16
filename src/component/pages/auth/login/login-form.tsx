@@ -6,26 +6,45 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Check, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { loginApi } from "@/api/auth-api";
+import { toast } from "sonner";
+import { storage } from "@/utils/storage";
+import { useRouter } from "next/navigation";
 
-const SignUpSchema = z.object({
+const LoginSchema = z.object({
   email: z.email("Invalid email"),
   password: z.string(),
 });
-type TSignUp = z.infer<typeof SignUpSchema>;
+type TLogin = z.infer<typeof LoginSchema>;
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+
+  const router = useRouter();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<TSignUp>({
-    resolver: zodResolver(SignUpSchema),
+  } = useForm<TLogin>({
+    resolver: zodResolver(LoginSchema),
   });
 
-  const onSubmit = (data: TSignUp) => {
-    console.log("Form data:", data);
+  const onSubmit = async (data: TLogin) => {
+    const res = await loginApi(data);
+
+    if (res.access) {
+      toast.success("Sign up successfully! Redirecting to login...");
+
+      storage.set("access", res.access);
+      storage.set("refresh", res.refresh);
+
+      router.push("/");
+    } else if (!res.ok) {
+      toast.error(res.detail);
+    }
+
+    console.log({ res });
   };
 
   return (
