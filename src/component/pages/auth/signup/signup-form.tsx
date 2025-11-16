@@ -5,14 +5,17 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { signupApi } from "@/api/auth-api";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const SignUpSchema = z
   .object({
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
+    first_name: z.string().min(1, "First name is required"),
+    last_name: z.string().min(1, "Last name is required"),
     email: z.email("Invalid email"),
-    password: z.string().min(4, "Password must be at least 4 characters"),
-    confirmPassword: z.string().min(4),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(6),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -25,6 +28,8 @@ const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -33,8 +38,15 @@ const SignupForm = () => {
     resolver: zodResolver(SignUpSchema),
   });
 
-  const onSubmit = (data: TSignUp) => {
-    console.log("Form data:", data);
+  const onSubmit = async (data: TSignUp) => {
+    const res = await signupApi(data);
+
+    if (res.email) {
+      toast.success("Sign up successfully! Redirecting to login...");
+      router.push("/auth/login");
+    } else if (!res.ok) {
+      toast.error(res.detail);
+    }
   };
 
   return (
@@ -48,10 +60,10 @@ const SignupForm = () => {
             </label>
             <input
               className="w-full border border-[#D1D5DB] px-3 py-2 rounded-lg"
-              {...register("firstName")}
+              {...register("first_name")}
             />
-            {errors.firstName && (
-              <p className="text-red-500 text-sm">{errors.firstName.message}</p>
+            {errors.first_name && (
+              <p className="text-red text-sm">{errors.first_name.message}</p>
             )}
           </div>
 
@@ -61,10 +73,10 @@ const SignupForm = () => {
             </label>
             <input
               className="w-full border border-[#D1D5DB] px-3 py-2 rounded-lg"
-              {...register("lastName")}
+              {...register("last_name")}
             />
-            {errors.lastName && (
-              <p className="text-red-500 text-sm">{errors.lastName.message}</p>
+            {errors.last_name && (
+              <p className="text-red text-sm">{errors.last_name.message}</p>
             )}
           </div>
         </div>
@@ -77,7 +89,7 @@ const SignupForm = () => {
             {...register("email")}
           />
           {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email.message}</p>
+            <p className="text-red text-sm">{errors.email.message}</p>
           )}
         </div>
 
@@ -104,9 +116,7 @@ const SignupForm = () => {
           </span>
 
           {errors.password && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.password.message}
-            </p>
+            <p className="text-red text-sm mt-1">{errors.password.message}</p>
           )}
         </div>
 
@@ -135,7 +145,7 @@ const SignupForm = () => {
           </span>
 
           {errors.confirmPassword && (
-            <p className="text-red-500 text-sm mt-1">
+            <p className="text-red text-sm mt-1">
               {errors.confirmPassword.message}
             </p>
           )}
@@ -152,7 +162,7 @@ const SignupForm = () => {
         {/* LOGIN TEXT */}
         <p className="text-center mt-2">
           Already have an account?{" "}
-          <a href="/login" className="text-primary underline">
+          <a href="/auth/login" className="text-primary underline">
             Log in
           </a>
         </p>
