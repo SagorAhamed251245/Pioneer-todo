@@ -7,7 +7,7 @@ const Navbar = () => {
   const { dayName, formattedDate } = getTodayDayAndDate();
 
   return (
-    <div className="h-16 bg-background flex items-center justify-between">
+    <div className="h-16 bg-background px-14  flex items-center justify-between">
       <Image src={"/logo.png"} width={105} height={32} alt="Logo" />
       <div className="flex items-center gap-5">
         <span className="bg-primary p-2 rounded-lg text-white">
