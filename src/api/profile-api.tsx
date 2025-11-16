@@ -11,7 +11,25 @@ export const profileApi = async (
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    next: { revalidate: 300 },
+  });
+
+  return res.json();
+};
+
+export const updateProfile = async ({
+  token,
+  data,
+}: {
+  token: string;
+  data: Partial<TUser>;
+}): Promise<TUser & { ok: boolean; detail?: string }> => {
+  const res = await fetch(baseApi(`/api/users/me/`), {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
   });
 
   return res.json();

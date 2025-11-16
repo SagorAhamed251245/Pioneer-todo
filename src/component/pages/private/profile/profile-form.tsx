@@ -1,134 +1,180 @@
+// components/profile-form.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { TUser } from "@/types";
+import { storage } from "@/utils/storage";
+import UploadImage from "./upload-image";
+import { useState } from "react";
+import { updateProfile } from "@/api/profile-api";
+import { toast } from "sonner";
 
-// Zod Schema
 const profileSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email"),
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  email: z.email("Invalid email"),
   address: z.string().min(1, "Address is required"),
-  number: z.string().min(1, "Contact number is required"),
-  dob: z.string().min(1, "Date of birth is required"),
+  contact_number: z.string().min(1, "Contact number is required"),
+  birthday: z.string().min(1, "Date of birth is required"),
 });
 
 type TProfile = z.infer<typeof profileSchema>;
 
 const ProfileForm = () => {
+  const storedUser = storage.get("user");
+  const profile: TUser = storedUser ? JSON.parse(storedUser) : ({} as TUser);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const token = storage.get("access");
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<TProfile>({
     resolver: zodResolver(profileSchema),
+    defaultValues: {
+      first_name: profile?.first_name ?? "",
+      last_name: profile?.last_name ?? "",
+      email: profile?.email ?? "",
+      address: profile?.address ?? "",
+      contact_number: profile?.contact_number ?? "",
+      birthday: profile?.birthday ?? "",
+    },
   });
 
-  const onSubmit = (data: TProfile) => {
-    console.log("Form data:", data);
+  const onSubmit = async (data: TProfile) => {
+    const payload = new FormData();
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (key !== "image" && value !== undefined) {
+        payload.append(key, value as string);
+      }
+    });
+
+    if (selectedFile) {
+      payload.append("image", selectedFile);
+    }
+
+    const res = await updateProfile({ token: token as string, data: data });
+
+    if (res.email) {
+      storage.set("user", JSON.stringify(res));
+      toast.success("Profile updated");
+      console.log(res);
+    }
   };
 
   return (
-    <div className="w-full mt-9">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* FIRST + LAST NAME */}
+    <div className="max-w-2xl mx-auto">
+      <UploadImage
+        onFileSelect={setSelectedFile}
+        preview={profile?.profile_image ?? null}
+      />
+
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-9 space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block mb-1 text-black font-semibold">
+            <label className="block mb-1 font-semibold text-black">
               First Name
             </label>
             <input
-              className="w-full border border-[#D1D5DB] px-3 py-2 rounded-lg"
-              {...register("firstName")}
+              className="w-full rounded-lg border border-[#D1D5DB] px-3 py-2"
+              {...register("first_name")}
             />
-            {errors.firstName && (
-              <p className="text-red-500 text-sm">{errors.firstName.message}</p>
+            {errors.first_name && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.first_name.message}
+              </p>
             )}
           </div>
 
           <div>
-            <label className="block mb-1 text-black font-semibold">
+            <label className="block mb-1 font-semibold text-black">
               Last Name
             </label>
             <input
-              className="w-full border border-[#D1D5DB] px-3 py-2 rounded-lg"
-              {...register("lastName")}
+              className="w-full rounded-lg border border-[#D1D5DB] px-3 py-2"
+              {...register("last_name")}
             />
-            {errors.lastName && (
-              <p className="text-red-500 text-sm">{errors.lastName.message}</p>
+            {errors.last_name && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.last_name.message}
+              </p>
             )}
           </div>
         </div>
 
-        {/* EMAIL */}
         <div>
-          <label className="block mb-1 text-black font-semibold">Email</label>
+          <label className="block mb-1 font-semibold text-black">Email</label>
           <input
-            className="w-full border border-[#D1D5DB] px-3 py-2 rounded-lg"
+            className="w-full rounded-lg border border-[#D1D5DB] px-3 py-2"
             {...register("email")}
           />
           {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email.message}</p>
+            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
           )}
         </div>
 
-        {/* ADDRESS + CONTACT NUMBER */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block mb-1 text-black font-semibold">
+            <label className="block mb-1 font-semibold text-black">
               Address
             </label>
             <input
-              className="w-full border border-[#D1D5DB] px-3 py-2 rounded-lg"
+              className="w-full rounded-lg border border-[#D1D5DB] px-3 py-2"
               {...register("address")}
             />
             {errors.address && (
-              <p className="text-red-500 text-sm">{errors.address.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.address.message}
+              </p>
             )}
           </div>
 
           <div>
-            <label className="block mb-1 text-black font-semibold">
+            <label className="block mb-1 font-semibold text-black">
               Contact Number
             </label>
             <input
-              className="w-full border border-[#D1D5DB] px-3 py-2 rounded-lg"
-              {...register("number")}
+              className="w-full rounded-lg border border-[#D1D5DB] px-3 py-2"
+              {...register("contact_number")}
             />
-            {errors.number && (
-              <p className="text-red-500 text-sm">{errors.number.message}</p>
+            {errors.contact_number && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.contact_number.message}
+              </p>
             )}
           </div>
         </div>
 
-        {/* DOB */}
         <div>
-          <label className="block mb-1 text-black font-semibold">
+          <label className="block mb-1 font-semibold text-black">
             Date of Birth
           </label>
           <input
             type="date"
-            className="w-full border border-[#D1D5DB] px-3 py-2 rounded-lg"
-            {...register("dob")}
+            className="w-full rounded-lg border border-[#D1D5DB] px-3 py-2"
+            {...register("birthday")}
           />
-          {errors.dob && (
-            <p className="text-red-500 text-sm">{errors.dob.message}</p>
+          {errors.birthday && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.birthday.message}
+            </p>
           )}
         </div>
 
-        {/* SUBMIT BUTTON */}
-
-        <div className="flex items-center justify-center gap-6">
+        <div className="flex justify-center gap-6">
           <button
             type="submit"
-            className="w-[200px] px-3 bg-primary text-white h-10 rounded-lg hover:bg-primary/90"
+            className="w-[200px] rounded-lg bg-primary py-2.5 font-medium text-white hover:bg-primary/90"
           >
             Save Changes
           </button>
           <button
             type="button"
-            className="w-[200px] bg-grey text-white h-10 rounded-lg hover:bg-grey/90"
+            className="w-[200px] rounded-lg bg-gray-500 py-2.5 font-medium text-white hover:bg-gray-600"
           >
             Cancel
           </button>

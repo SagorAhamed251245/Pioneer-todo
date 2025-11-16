@@ -11,7 +11,6 @@ const Dashboard = () => {
     if (profile.id) {
       storage.set("user", JSON.stringify(profile));
     }
-    console.log(profile);
   };
 
   useEffect(() => {

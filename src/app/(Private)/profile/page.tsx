@@ -8,8 +8,8 @@ const ProfilePage = () => {
       <p className="text-2xl font-semibold">Account Information </p>
 
       <hr className="w-[161px]  border-2  border-primary mb-6" />
-      <UploadImage />
-      <ProfileForm/>
+
+      <ProfileForm />
     </div>
   );
 };

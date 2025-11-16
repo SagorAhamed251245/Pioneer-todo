@@ -1,13 +1,18 @@
 "use client";
+import { TUser } from "@/types";
+import { storage } from "@/utils/storage";
 import { cn } from "@/utils/utils";
 import { House } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { memo, useEffect } from "react";
 
 const Sidebar = () => {
   const path = usePathname();
+
+  const storedUser = storage.get("user");
+  const profile: TUser = storedUser ? JSON.parse(storedUser) : ({} as TUser);
 
   return (
     <div className="w-2/12 h-screen flex flex-col gap-12 bg-background-dark">
@@ -22,8 +27,10 @@ const Sidebar = () => {
           />
         </div>
         <div className="text-white text-center mt-3">
-          <p className="font-bold">amanuel</p>
-          <p className="text-sm">amanuel@gmail.com</p>
+          <p className="font-bold">
+            {profile.first_name} {profile.last_name}
+          </p>
+          <p className="text-sm">{profile.email}</p>
         </div>
       </div>
 
@@ -69,4 +76,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default memo(Sidebar);
