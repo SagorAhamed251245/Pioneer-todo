@@ -5,9 +5,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Trash2 } from "lucide-react";
 import React from "react";
-import { addTodoApi } from "@/api/todo-api";
+import { addTodoApi, updateTodoApi } from "@/api/todo-api";
 import { storage } from "@/utils/storage";
 import { toast } from "sonner";
+import { TTodo as TTodoType } from "@/types/todo.type";
 
 // Schema
 const taskSchema = z.object({
@@ -16,12 +17,21 @@ const taskSchema = z.object({
   priority: z.string<"extreme" | "moderate" | "low">({
     error: "Select one priority",
   }),
+  is_completed: z.boolean().optional(), // Now boolean
   description: z.string().min(1, "Description is required"),
 });
 
 type TTodo = z.infer<typeof taskSchema>;
 
-const AddTaskForm = ({ onClose }: { onClose: React.Dispatch<boolean> }) => {
+const AddTaskForm = ({
+  onClose,
+  todo,
+  onDelete,
+}: {
+  onClose: React.Dispatch<boolean>;
+  todo?: TTodoType;
+  onDelete?: ((id: number) => void) | undefined;
+}) => {
   const token = storage.get("access");
   const {
     register,
@@ -29,16 +39,36 @@ const AddTaskForm = ({ onClose }: { onClose: React.Dispatch<boolean> }) => {
     formState: { errors },
   } = useForm<TTodo>({
     resolver: zodResolver(taskSchema),
+    defaultValues: {
+      description: todo?.description || "",
+      priority: todo?.priority,
+      title: todo?.title,
+      todo_date: todo?.todo_date,
+      is_completed: todo?.is_completed ?? false, // default to false
+    },
   });
 
   const onSubmit = async (data: TTodo) => {
-    const res = await addTodoApi(token as string, data);
-
-    if (res.id) {
-      toast.success("Todo Added sussfully");
-      onClose(false);
+    if (todo) {
+      const res = await updateTodoApi(token as string, {
+        ...data,
+        id: todo.id,
+      });
+      if (res?.id) {
+        console.log({ res });
+        toast.success("Todo Added sussfully");
+        onClose(false);
+      } else {
+        toast.error("Something was wrong");
+      }
     } else {
-      toast.error("Something was wrong");
+      const res = await addTodoApi(token as string, data);
+      if (res.id) {
+        toast.success("Todo Added sussfully");
+        onClose(false);
+      } else {
+        toast.error("Something was wrong");
+      }
     }
   };
 
@@ -47,7 +77,9 @@ const AddTaskForm = ({ onClose }: { onClose: React.Dispatch<boolean> }) => {
       {/* HEADER */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-lg font-semibold ">Add New Task</p>
+          <p className="text-lg font-semibold ">
+            {todo ? "Update the task" : "Add New Task"}
+          </p>
           <hr className="w-9  border-2  border-primary" />
         </div>
         <button
@@ -136,6 +168,21 @@ const AddTaskForm = ({ onClose }: { onClose: React.Dispatch<boolean> }) => {
           )}
         </div>
 
+        {/* COMPLETED */}
+        {todo && (
+          <div>
+            <label className="block mb-2 font-semibold">Completed</label>
+            <label className="flex items-center gap-2 cursor-pointer text-sm">
+              <input
+                type="checkbox"
+                {...register("is_completed")}
+                className="w-5 h-5 text-[#5A6FF0] rounded focus:ring-[#5A6FF0]"
+              />
+              <span>Mark as completed</span>
+            </label>
+          </div>
+        )}
+
         {/* DESCRIPTION */}
         <div>
           <label className="block mb-1 font-semibold">Task Description</label>
@@ -159,12 +206,15 @@ const AddTaskForm = ({ onClose }: { onClose: React.Dispatch<boolean> }) => {
             Done
           </button>
 
-          <button
-            type="button"
-            className="p-3 bg-red text-white rounded-lg hover:bg-red"
-          >
-            <Trash2 className="size-5" />
-          </button>
+          {todo && onDelete && (
+            <button
+              type="button"
+              className="p-3 bg-red text-white rounded-lg hover:bg-red"
+              onClick={() => onDelete(todo.id)}
+            >
+              <Trash2 className="size-5" />
+            </button>
+          )}
         </div>
       </form>
     </div>

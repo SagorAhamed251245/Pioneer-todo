@@ -42,8 +42,8 @@ export const addTodoApi = async (
 
 export const updateTodoApi = async (
   token: string,
-  data: TTodo
-): Promise<TTodoRes> => {
+  data: Partial<TTodo>
+): Promise<TTodo> => {
   const res = await fetch(baseApi(`/api/todos/${data.id}/`), {
     method: "PATCH",
     headers: {

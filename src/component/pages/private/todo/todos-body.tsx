@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import TodoItem from "./todo-item";
-import { GripVertical } from "lucide-react";
 import { TTodo } from "@/types/todo.type";
 import { storage } from "@/utils/storage";
 import { deleteTodoApi, updateTodoApi } from "@/api/todo-api";
@@ -49,30 +48,33 @@ const TodosBody = ({ todos }: { todos: TTodo[] }) => {
       </div>
     </div>
   ) : (
-    <div className="grid flex-1 grid-cols-1 lg:grid-cols-3 gap-2 mt-6 ">
-      {" "}
-      <Column
-        priority="extreme"
-        columnTasks={extremeTasks}
-        onDragStart={handleDragStart}
-        onDrop={handleDrop}
-        onDelete={handleDelete}
-      />
-      <Column
-        priority="moderate"
-        columnTasks={moderateTasks}
-        onDragStart={handleDragStart}
-        onDrop={handleDrop}
-        onDelete={handleDelete}
-      />
-      <Column
-        priority="low"
-        columnTasks={lowTasks}
-        onDragStart={handleDragStart}
-        onDrop={handleDrop}
-        onDelete={handleDelete}
-      />
-    </div>
+    <>
+      <p className="text-xl  mt-6 font-bold">Your Tasks</p>
+      <div className="grid flex-1 grid-cols-1 lg:grid-cols-3 gap-2 mt-6 ">
+        {" "}
+        <Column
+          priority="extreme"
+          columnTasks={extremeTasks}
+          onDragStart={handleDragStart}
+          onDrop={handleDrop}
+          onDelete={handleDelete}
+        />
+        <Column
+          priority="moderate"
+          columnTasks={moderateTasks}
+          onDragStart={handleDragStart}
+          onDrop={handleDrop}
+          onDelete={handleDelete}
+        />
+        <Column
+          priority="low"
+          columnTasks={lowTasks}
+          onDragStart={handleDragStart}
+          onDrop={handleDrop}
+          onDelete={handleDelete}
+        />
+      </div>
+    </>
   );
 };
 
@@ -114,8 +116,8 @@ const Column = ({
                 description={todo.description}
                 dueDate={todo.todo_date}
                 priority={todo.priority}
-                onEdit={() => {}}
                 onDelete={() => onDelete(todo.id)}
+                todo={todo}
               />
             </div>
           ))
