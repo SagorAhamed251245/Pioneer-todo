@@ -1,6 +1,4 @@
 import ProfileForm from "@/component/pages/private/profile/profile-form";
-import UploadImage from "@/component/pages/private/profile/upload-image";
-import React from "react";
 
 const ProfilePage = () => {
   return (

@@ -1,12 +1,14 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SearchTodo from "./search-todo";
 import TodosBody from "./todos-body";
 import { Plus } from "lucide-react";
 import AddTaskForm from "./add-task-form";
+import { TTodoRes } from "@/types/todo.type";
 
-const TodoManagement = () => {
+const TodoManagement = ({ todosRes }: { todosRes: TTodoRes }) => {
   const [openForm, setOpenForm] = useState(false);
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -23,7 +25,7 @@ const TodoManagement = () => {
 
       <div className="flex-1  flex flex-col">
         <SearchTodo />
-        <TodosBody />
+        <TodosBody todos={todosRes.results} />
       </div>
 
       {openForm && (

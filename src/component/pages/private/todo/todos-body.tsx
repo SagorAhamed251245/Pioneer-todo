@@ -3,90 +3,40 @@
 import React, { useState } from "react";
 import TodoItem from "./todo-item";
 import { GripVertical } from "lucide-react";
+import { TTodo } from "@/types/todo.type";
+import { storage } from "@/utils/storage";
+import { deleteTodoApi, updateTodoApi } from "@/api/todo-api";
 
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  dueDate: string;
-  priority: "extreme" | "moderate" | "low";
-}
+const TodosBody = ({ todos }: { todos: TTodo[] }) => {
+  const [draggedTask, setDraggedTask] = useState<TTodo | null>(null);
+  const token = storage.get("access");
 
-const TodosBody = () => {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: 1,
-      title: "Backend Infrastructure",
-      description: "Upgrading backend infrastructure for better performance",
-      dueDate: "Apr 15, 2025",
-      priority: "extreme",
-    },
-    {
-      id: 5,
-      title: "Security Audit",
-      description: "Conduct comprehensive security audit of all systems",
-      dueDate: "Feb 28, 2025",
-      priority: "extreme",
-    },
-    {
-      id: 2,
-      title: "Mobile App Redesign",
-      description:
-        "Redesigning the mobile app interface for better user experience",
-      dueDate: "Mar 25, 2025",
-      priority: "moderate",
-    },
-    {
-      id: 4,
-      title: "Database Optimization",
-      description: "Optimize database queries and improve response times",
-      dueDate: "May 10, 2025",
-      priority: "moderate",
-    },
-    {
-      id: 3,
-      title: "Analytics Dashboard",
-      description: "Creating a new analytics dashboard for clients",
-      dueDate: "Mar 30, 2025",
-      priority: "low",
-    },
-    {
-      id: 6,
-      title: "Documentation Update",
-      description: "Update API documentation and add new examples",
-      dueDate: "Apr 5, 2025",
-      priority: "low",
-    },
-  ]);
-
-  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
-
-  const handleDragStart = (task: Task) => {
-    setDraggedTask(task);
+  const handleDragStart = (todo: TTodo) => {
+    setDraggedTask(todo);
   };
 
-  const handleDrop = (targetPriority: "extreme" | "moderate" | "low") => {
+  const handleDrop = async (targetPriority: "extreme" | "moderate" | "low") => {
     if (!draggedTask) return;
 
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === draggedTask.id ? { ...t, priority: targetPriority } : t
-      )
-    );
+    await updateTodoApi(token as string, {
+      ...draggedTask,
+      priority: targetPriority,
+    });
 
     setDraggedTask(null);
   };
 
-  const handleDelete = (id: number) => {
-    setTasks((prev) => prev.filter((task) => task.id !== id));
+  const handleDelete = async (id: number) => {
+    const res = await deleteTodoApi(token as string, id);
+    console.log({ res });
   };
 
-  const extremeTasks = tasks.filter((t) => t.priority === "extreme");
-  const moderateTasks = tasks.filter((t) => t.priority === "moderate");
-  const lowTasks = tasks.filter((t) => t.priority === "low");
+  const extremeTasks = todos?.filter((t) => t.priority === "extreme");
+  const moderateTasks = todos?.filter((t) => t.priority === "moderate");
+  const lowTasks = todos?.filter((t) => t.priority === "low");
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 mt-6">
+    <div className="grid flex-1 grid-cols-1 lg:grid-cols-3 gap-2 mt-6 ">
       <Column
         priority="extreme"
         columnTasks={extremeTasks}
@@ -124,42 +74,42 @@ const Column = ({
   onDelete,
 }: {
   priority: "extreme" | "moderate" | "low";
-  columnTasks: Task[];
-  onDragStart: (task: Task) => void;
+  columnTasks: TTodo[];
+  onDragStart: (todo: TTodo) => void;
   onDrop: (priority: "extreme" | "moderate" | "low") => void;
   onDelete: (id: number) => void;
 }) => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 ">
       {/* HEADER */}
 
       {/* DROP AREA */}
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={() => onDrop(priority)}
-        className="flex-1 space-y-3 w-full"
+        className="flex-1 space-y-3 w-full "
       >
-        {columnTasks.length > 0 ? (
-          columnTasks.map((task) => (
+        {columnTasks?.length > 0 ? (
+          columnTasks.map((todo) => (
             <div
-              key={task.id}
+              key={todo.id}
               draggable
-              onDragStart={() => onDragStart(task)}
+              onDragStart={() => onDragStart(todo)}
               className="cursor-grab active:cursor-grabbing group w-full"
             >
               <TodoItem
-                title={task.title}
-                description={task.description}
-                dueDate={task.dueDate}
-                priority={task.priority}
+                title={todo.title}
+                description={todo.description}
+                dueDate={todo.todo_date}
+                priority={todo.priority}
                 onEdit={() => {}}
-                onDelete={() => onDelete(task.id)}
+                onDelete={() => onDelete(todo.id)}
               />
             </div>
           ))
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400 text-sm font-medium">
-            Drop tasks here
+            Drop todos here
           </div>
         )}
       </div>

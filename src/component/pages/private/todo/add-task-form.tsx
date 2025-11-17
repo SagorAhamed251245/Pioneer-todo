@@ -3,32 +3,43 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import React from "react";
+import { addTodoApi } from "@/api/todo-api";
+import { storage } from "@/utils/storage";
+import { toast } from "sonner";
 
 // Schema
 const taskSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  date: z.string().min(1, "Date is required"),
-  priority: z.enum<string[]>(["extreme", "moderate", "low"], {
+  todo_date: z.string().min(1, "Date is required"),
+  priority: z.string<"extreme" | "moderate" | "low">({
     error: "Select one priority",
   }),
   description: z.string().min(1, "Description is required"),
 });
 
-type TTask = z.infer<typeof taskSchema>;
+type TTodo = z.infer<typeof taskSchema>;
 
 const AddTaskForm = ({ onClose }: { onClose: React.Dispatch<boolean> }) => {
+  const token = storage.get("access");
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<TTask>({
+  } = useForm<TTodo>({
     resolver: zodResolver(taskSchema),
   });
 
-  const onSubmit = (data: TTask) => {
-    console.log("Task Data:", data);
+  const onSubmit = async (data: TTodo) => {
+    const res = await addTodoApi(token as string, data);
+
+    if (res.id) {
+      toast.success("Todo Added sussfully");
+      onClose(false);
+    } else {
+      toast.error("Something was wrong");
+    }
   };
 
   return (
@@ -68,11 +79,11 @@ const AddTaskForm = ({ onClose }: { onClose: React.Dispatch<boolean> }) => {
             <input
               type="date"
               className="w-full border border-grey px-3 py-2 rounded-lg"
-              {...register("date")}
+              {...register("todo_date")}
             />
           </div>
-          {errors.date && (
-            <p className="text-red text-sm">{errors.date.message}</p>
+          {errors.todo_date && (
+            <p className="text-red text-sm">{errors.todo_date.message}</p>
           )}
         </div>
 
@@ -83,43 +94,45 @@ const AddTaskForm = ({ onClose }: { onClose: React.Dispatch<boolean> }) => {
           <div className="flex items-center gap-6">
             {/* Extreme */}
             <label className="flex items-center gap-2 cursor-pointer text-sm">
-              <span className="w-2 h-2 bg-red rounded-full"></span>
+              <span className="size-2 bg-red-600 rounded-full"></span>
               Extreme
               <input
-                type="checkbox"
+                type="radio"
                 value="extreme"
                 {...register("priority")}
-                className="w-4 h-4"
+                className="w-4 h-4 text-red-600 focus:ring-red-500 size-4"
               />
             </label>
 
             {/* Moderate */}
             <label className="flex items-center gap-2 cursor-pointer text-sm">
-              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span className="size-2 bg-green-500 rounded-full"></span>
               Moderate
               <input
-                type="checkbox"
+                type="radio"
                 value="moderate"
                 {...register("priority")}
-                className="w-4 h-4"
+                className="w-4 h-4 text-green-500 focus:ring-green-500"
               />
             </label>
 
             {/* Low */}
             <label className="flex items-center gap-2 cursor-pointer text-sm">
-              <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+              <span className="size-2 bg-yellow-500 rounded-full"></span>
               Low
               <input
-                type="checkbox"
+                type="radio"
                 value="low"
                 {...register("priority")}
-                className="w-4 h-4"
+                className="w-4 h-4 text-yellow-500 focus:ring-yellow-500"
               />
             </label>
           </div>
 
           {errors.priority && (
-            <p className="text-red text-sm">{errors.priority.message}</p>
+            <p className="text-red-500 text-sm mt-1">
+              {errors.priority.message}
+            </p>
           )}
         </div>
 
@@ -150,7 +163,7 @@ const AddTaskForm = ({ onClose }: { onClose: React.Dispatch<boolean> }) => {
             type="button"
             className="p-3 bg-red text-white rounded-lg hover:bg-red"
           >
-            <Trash2 className="size-5"/>
+            <Trash2 className="size-5" />
           </button>
         </div>
       </form>
