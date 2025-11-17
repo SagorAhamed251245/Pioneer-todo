@@ -2,17 +2,23 @@
 import { TUser } from "@/types";
 import { storage } from "@/utils/storage";
 import { cn } from "@/utils/utils";
-import { House } from "lucide-react";
+import { House, LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { memo, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { memo, useEffect } from "react";
 
 const Sidebar = () => {
   const path = usePathname();
+  const router = useRouter();
 
   const storedUser = storage.get("user");
   const profile: TUser = storedUser ? JSON.parse(storedUser) : ({} as TUser);
+
+  const handelLogout = () => {
+    storage.clear();
+    router.push("/auth/login");
+  };
 
   return (
     <div className="w-2/12 h-screen flex flex-col gap-12 bg-background-dark">
@@ -34,8 +40,8 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div>
-        <div className="space-y-5">
+      <div className="flex-1 flex flex-col items-center w-full">
+        <div className="space-y-5 flex-1 w-full">
           <Link
             href={"/"}
             className={cn(
@@ -70,6 +76,16 @@ const Sidebar = () => {
             <House className="" />
             Account Information
           </Link>
+        </div>
+        <div
+          className={cn(
+            "text-grey flex w-full cursor-pointer items-center gap-3 pl-12  py-5  transition-all  duration-1000 ease-in-out",
+            "hover:bg-linear-to-r hover:from-[#003087] hover:to-background-dark"
+          )}
+          onClick={handelLogout}
+        >
+          <LogOut />
+          Logout
         </div>
       </div>
     </div>

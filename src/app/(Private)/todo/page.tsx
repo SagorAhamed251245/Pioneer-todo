@@ -10,7 +10,6 @@ const TodoPage = async ({
 }) => {
   const cookieStore = await cookies();
   const search = (await searchParams).search;
-  console.log({ search });
 
   const token = cookieStore.get("access");
 

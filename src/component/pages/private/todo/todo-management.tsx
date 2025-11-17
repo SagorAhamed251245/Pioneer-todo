@@ -1,12 +1,10 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SearchTodo from "./search-todo";
 import TodosBody from "./todos-body";
 import { Plus } from "lucide-react";
 import AddTaskForm from "./add-task-form";
 import { TTodo, TTodoRes } from "@/types/todo.type";
-import { getTodoApi } from "@/api/todo-api";
 import { useRouter } from "next/navigation";
 
 const TodoManagement = ({
