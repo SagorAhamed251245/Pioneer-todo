@@ -6,6 +6,7 @@ import { GripVertical } from "lucide-react";
 import { TTodo } from "@/types/todo.type";
 import { storage } from "@/utils/storage";
 import { deleteTodoApi, updateTodoApi } from "@/api/todo-api";
+import Image from "next/image";
 
 const TodosBody = ({ todos }: { todos: TTodo[] }) => {
   const [draggedTask, setDraggedTask] = useState<TTodo | null>(null);
@@ -35,8 +36,21 @@ const TodosBody = ({ todos }: { todos: TTodo[] }) => {
   const moderateTasks = todos?.filter((t) => t.priority === "moderate");
   const lowTasks = todos?.filter((t) => t.priority === "low");
 
-  return (
+  return todos.length < 1 ? (
+    <div className="flex-1 bg-white mt-8 rounded-lg flex flex-col">
+      <div className="flex-1 flex justify-center items-center flex-col">
+        <Image
+          src={"/icon-no projects.png"}
+          height={216}
+          width={240}
+          alt="icon-no projects.png"
+        />
+        <p>No todos yet</p>
+      </div>
+    </div>
+  ) : (
     <div className="grid flex-1 grid-cols-1 lg:grid-cols-3 gap-2 mt-6 ">
+      {" "}
       <Column
         priority="extreme"
         columnTasks={extremeTasks}
@@ -44,7 +58,6 @@ const TodosBody = ({ todos }: { todos: TTodo[] }) => {
         onDrop={handleDrop}
         onDelete={handleDelete}
       />
-
       <Column
         priority="moderate"
         columnTasks={moderateTasks}
@@ -52,7 +65,6 @@ const TodosBody = ({ todos }: { todos: TTodo[] }) => {
         onDrop={handleDrop}
         onDelete={handleDelete}
       />
-
       <Column
         priority="low"
         columnTasks={lowTasks}

@@ -25,6 +25,8 @@ const TodoManagement = ({ todosRes }: { todosRes: TTodoRes }) => {
 
       <div className="flex-1  flex flex-col">
         <SearchTodo />
+
+        
         <TodosBody todos={todosRes.results} />
       </div>
 
