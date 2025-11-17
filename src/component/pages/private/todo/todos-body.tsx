@@ -35,7 +35,7 @@ const TodosBody = ({ todos }: { todos: TTodo[] }) => {
   const moderateTasks = todos?.filter((t) => t.priority === "moderate");
   const lowTasks = todos?.filter((t) => t.priority === "low");
 
-  return todos.length < 1 ? (
+  return todos?.length < 1 ? (
     <div className="flex-1 bg-white mt-8 rounded-lg flex flex-col">
       <div className="flex-1 flex justify-center items-center flex-col">
         <Image

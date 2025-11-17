@@ -4,14 +4,17 @@ import { baseApi } from "./base-api";
 import { updateTag } from "next/cache";
 
 export const getTodoApi = async (
-  token: string
-): Promise<{
-  count: number;
-  next: null;
-  previous: null | number;
-  results: TTodo[];
-}> => {
-  const res = await fetch(baseApi(`/api/todos/`), {
+  token: string,
+  query?: { search?: string; todo_date?: string }
+) => {
+  const params = new URLSearchParams();
+
+  if (query?.search) params.append("search", query.search);
+  if (query?.todo_date) params.append("todo_date", query.todo_date);
+
+  const url = baseApi(`/api/todos/?${params.toString()}`);
+
+  const res = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
