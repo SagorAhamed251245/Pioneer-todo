@@ -50,7 +50,7 @@ const TodosBody = ({ todos }: { todos: TTodo[] }) => {
   ) : (
     <>
       <p className="text-xl  mt-6 font-bold">Your Tasks</p>
-      <div className="grid flex-1 grid-cols-1 lg:grid-cols-3 gap-2 mt-6 ">
+      <div className="grid flex-1 grid-cols-2 lg:grid-cols-3 gap-2 mt-6 ">
         {" "}
         <Column
           priority="extreme"

@@ -18,7 +18,7 @@ const LoginPage = () => {
       </div>
 
       {/* Right Side Content */}
-      <div className="w-4/7 h-full flex flex-col items-center justify-center">
+      <div className="w-4/7 h-full bg-white flex flex-col items-center justify-center">
         <p className="text-2xl md:text-3xl font-bold text-background-dark text-center">
           Log in to your account
         </p>

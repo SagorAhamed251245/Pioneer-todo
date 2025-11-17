@@ -17,7 +17,7 @@ const SignUpPage = () => {
       </div>
 
       {/* Right Content Section */}
-      <div className="w-4/7 h-full flex flex-col items-center justify-center mx-auto">
+      <div className="w-4/7 h-full bg-white flex flex-col items-center justify-center mx-auto">
         <p className="text-2xl md:text-3xl font-bold text-background-dark text-center">
           Create your account
         </p>
